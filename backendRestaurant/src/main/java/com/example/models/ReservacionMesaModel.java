@@ -13,13 +13,14 @@ public class ReservacionMesaModel {
     @Column(name = "ID", unique = true, nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RESERVACION_ID", nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "RESERVACION_ID")
     private ReservacionModel reservacion;
-
+    
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "MESA_ID")
-
     private MesaModel mesa;
+    
+    
     
 }

@@ -1,12 +1,12 @@
 package com.example.dtos;
 
-import com.example.models.ReservacionMesaModel;
+import com.example.models.MesaModel;
 import java.util.Date;
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class ReservacionDto {
+public class reservacionDto {
     private Long id;
     private String persona;
     private String duiPersona;
@@ -15,5 +15,5 @@ public class ReservacionDto {
     private String horaReserva;
     private Long numPersonas;
     private boolean activa;
-    private List<ReservacionMesaModel> reservacionMesa;
+    private List<MesaModel> mesas;
 }

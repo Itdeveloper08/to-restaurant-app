@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface ReservacionMesaService{
 	public ArrayList<ReservacionMesaModel> obtenerReservacionMesas();
-	public ReservacionMesaModel guardarReservacionMesa(ReservacionMesaModel ReservacionMesaM);
+	ReservacionMesaModel guardarReservacionMesa(ReservacionMesaModel reservacionMesaModel);
 	public Optional<ReservacionMesaModel> obtenerPorId(Long id);
 	public boolean eliminarReservacionMesa(Long id);
 }
