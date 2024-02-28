@@ -9,7 +9,7 @@ import com.example.dao.ReservacionMesaDao;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class ReservaMesaService {
+public class ReservacionMesaServiceImp implements ReservacionMesaService{
     @Autowired
     ReservacionMesaDao reservacionMesaDao;
     

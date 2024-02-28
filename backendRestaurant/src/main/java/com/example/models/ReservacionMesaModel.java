@@ -10,15 +10,16 @@ import lombok.Data;
 public class ReservacionMesaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="ID", unique=true, nullable = false)
+    @Column(name = "ID", unique = true, nullable = false)
     private Long id;
-    
-    @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "RESERVACION_ID")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "RESERVACION_ID", nullable = false)
     private ReservacionModel reservacion;
-    
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "MESA_ID")
-    private MesaModel mesa;    
+
+    private MesaModel mesa;
+    
 }

@@ -12,30 +12,30 @@ import lombok.Data;
 public class ReservacionModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="ID", unique=true, nullable = false)
+    @Column(name = "ID", unique = true, nullable = false)
     private Long id;
-    
-    @Column(name="PERSONA")
+
+    @Column(name = "PERSONA")
     private String persona;
-    
-    @Column(name="DUI_PERSONA")
+
+    @Column(name = "DUI_PERSONA")
     private String duiPersona;
-    
-    @Column(name="FECHA_RESERVACION")
+
+    @Column(name = "FECHA_RESERVACION")
     private Date fechaReservacion;
-    
-    @Column(name="FECHA_RESERVA")
+
+    @Column(name = "FECHA_RESERVA")
     private Date fechaReserva;
-    
-    @Column(name="HORA_RESERVA")
+
+    @Column(name = "HORA_RESERVA")
     private String horaReserva;
-    
-    @Column(name="NUM_PERSONAS")
+
+    @Column(name = "NUM_PERSONAS")
     private Long numPersonas;
-    
-    @Column(name="ACTIVA")
+
+    @Column(name = "ACTIVA")
     private boolean activa;
-    
+
     @JsonIgnoreProperties(value = "reservacion")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "reservacion")
     private List<ReservacionMesaModel> reservacionMesa;
