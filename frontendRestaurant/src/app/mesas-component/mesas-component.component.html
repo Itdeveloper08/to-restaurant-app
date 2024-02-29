@@ -1,0 +1,16 @@
+<div class="contenedorMesas">
+    <h1>Mesas</h1>
+    <div class="mesas contenedores">
+        <p class="mensaje">{{mensajeConexion}}</p>
+        <div class="grid-contenedor">
+            <div *ngFor="let mesa of mesas; let i = index" class="item{{i + 1}}">
+                <img [src]="listaDeImagenes[i]" (click)="ver(i)">
+              </div>
+        </div>
+    </div>
+    <div class="seleccion contenedores">
+        <h3>Mesa N° {{mesas[seleccion].id}}</h3>
+        <img [src]="listaDeImagenes[seleccion]" (click)="ver(seleccion)">
+        <p>Capacidad: {{mesas[seleccion].capacidad}}</p>
+    </div>
+</div>

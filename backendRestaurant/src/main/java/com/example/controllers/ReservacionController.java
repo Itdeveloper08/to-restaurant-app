@@ -7,7 +7,10 @@ import com.example.models.ReservacionModel;
 import com.example.services.MesaService;
 import com.example.services.ReservacionMesaService;
 import com.example.services.ReservacionService;
+import com.fasterxml.jackson.annotation.Nulls;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +33,12 @@ public class ReservacionController {
     MesaService mesaS;
 
     @GetMapping()
-    public ArrayList<ReservacionModel> obtenerReservaciones() {
-        return (ArrayList<ReservacionModel>) reservacionS.obtenerReservaciones();
+    public ArrayList<reservacionDto> obtenerReservaciones() {
+        
+        List<ReservacionModel> reservaciones = reservacionS.obtenerReservaciones();
+        return (ArrayList<reservacionDto>) reservaciones.stream()
+                .map(this::convertirReservacionADto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping()
@@ -102,5 +109,20 @@ public class ReservacionController {
         retorno.setActiva(reservacion.isActiva());
         return retorno;
     }
-
+    private reservacionDto convertirReservacionADto(ReservacionModel reservacion) {
+        reservacionDto retorno = new reservacionDto();
+        retorno.setId(reservacion.getId());
+        retorno.setPersona(reservacion.getPersona());
+        retorno.setDuiPersona(reservacion.getDuiPersona());
+        retorno.setFechaReservacion(reservacion.getFechaReservacion());
+        retorno.setFechaReserva(reservacion.getFechaReserva());
+        retorno.setHoraReserva(reservacion.getHoraReserva());
+        retorno.setNumPersonas(reservacion.getNumPersonas());
+        retorno.setActiva(reservacion.isActiva());
+        List<ReservacionMesaModel> reservacionMesas = reservacion.getReservacionMesa();
+        List<MesaModel> Mesa = new ArrayList<>();
+        for (ReservacionMesaModel reservacionMesa : reservacionMesas) Mesa.add(reservacionMesa.getMesa());
+        retorno.setMesas(Mesa);
+        return retorno;
+    }
 }
