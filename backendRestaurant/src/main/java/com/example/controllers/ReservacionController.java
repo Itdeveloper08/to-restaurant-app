@@ -7,13 +7,16 @@ import com.example.models.ReservacionModel;
 import com.example.services.MesaService;
 import com.example.services.ReservacionMesaService;
 import com.example.services.ReservacionService;
-import com.fasterxml.jackson.annotation.Nulls;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +28,7 @@ public class ReservacionController {
 
     @Autowired
     ReservacionService reservacionS;
-    
+
     @Autowired
     ReservacionMesaService reservaMesaS;
 
@@ -34,8 +37,15 @@ public class ReservacionController {
 
     @GetMapping()
     public ArrayList<reservacionDto> obtenerReservaciones() {
-        
         List<ReservacionModel> reservaciones = reservacionS.obtenerReservaciones();
+        return (ArrayList<reservacionDto>) reservaciones.stream()
+                .map(this::convertirReservacionADto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping(path = "/{fechaReserva}")
+    public ArrayList<reservacionDto> obtenerResservacionPorFecha(@PathVariable("fechaReserva") String fechaReserva) {
+        List<ReservacionModel> reservaciones = this.reservacionS.obtenerPorFechaReserva(fechaReserva);
         return (ArrayList<reservacionDto>) reservaciones.stream()
                 .map(this::convertirReservacionADto)
                 .collect(Collectors.toList());
@@ -45,7 +55,7 @@ public class ReservacionController {
     public ResponseEntity<?> guardarReservacion(@RequestBody reservacionDto reservacion) {
         ReservacionModel retorno = convertirDtoAReservacion(reservacion);
         //Si no vienen mesas en la reservacion
-        if(reservacion.getMesas()==null){
+        if (reservacion.getMesas() == null) {
             ReservacionModel retornoReservacionModel = this.reservacionS.guardarReservacion(retorno);
             if (retornoReservacionModel == null) {
                 return ResponseEntity.badRequest().body("La reservacion no pudo guardarse, revise la estructura del json");
@@ -79,7 +89,7 @@ public class ReservacionController {
             return ResponseEntity.badRequest().body("La reservacion no pudo guardarse, revise la estructura del json");
         }
         //guardando todas las mesas en la reservacion
-        
+
         boolean mesasGuardadas = true;
         for (MesaModel mesaPost : mesasEnPost) {
             ReservacionMesaModel reservacionMesaModel = new ReservacionMesaModel();
@@ -91,10 +101,20 @@ public class ReservacionController {
                 mesasGuardadas = false;
             }
         }
-        if(!mesasGuardadas){
+        if (!mesasGuardadas) {
             return ResponseEntity.badRequest().body("Las mesas presentaron error");
         }
         return ResponseEntity.ok("Reservacion guardada correctamente");
+    }
+
+    @DeleteMapping("/{id}")
+    public String eliminarPorId(@PathVariable("id") Long id) {
+        boolean ok = this.reservacionS.eliminarReservacion(id);
+        if (ok) {
+            return "Se eliminó la reservación con id " + id;
+        } else {
+            return "No se pudo eliminar la reservación con id " + id;
+        }
     }
 
     private ReservacionModel convertirDtoAReservacion(reservacionDto reservacion) {
@@ -109,6 +129,7 @@ public class ReservacionController {
         retorno.setActiva(reservacion.isActiva());
         return retorno;
     }
+
     private reservacionDto convertirReservacionADto(ReservacionModel reservacion) {
         reservacionDto retorno = new reservacionDto();
         retorno.setId(reservacion.getId());
@@ -121,7 +142,9 @@ public class ReservacionController {
         retorno.setActiva(reservacion.isActiva());
         List<ReservacionMesaModel> reservacionMesas = reservacion.getReservacionMesa();
         List<MesaModel> Mesa = new ArrayList<>();
-        for (ReservacionMesaModel reservacionMesa : reservacionMesas) Mesa.add(reservacionMesa.getMesa());
+        for (ReservacionMesaModel reservacionMesa : reservacionMesas) {
+            Mesa.add(reservacionMesa.getMesa());
+        }
         retorno.setMesas(Mesa);
         return retorno;
     }

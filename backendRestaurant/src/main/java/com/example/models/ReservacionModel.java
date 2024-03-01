@@ -25,7 +25,7 @@ public class ReservacionModel {
     private Date fechaReservacion;
 
     @Column(name = "FECHA_RESERVA")
-    private Date fechaReserva;
+    private String fechaReserva;
 
     @Column(name = "HORA_RESERVA")
     private String horaReserva;
@@ -38,5 +38,6 @@ public class ReservacionModel {
 
     @JsonIgnoreProperties(value = "reservacion")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "reservacion")
-    private List<ReservacionMesaModel> reservacionMesa;
+private List<ReservacionMesaModel> reservacionMesa;
+    
 }

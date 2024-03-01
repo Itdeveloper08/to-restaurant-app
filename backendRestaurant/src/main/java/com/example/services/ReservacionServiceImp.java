@@ -35,6 +35,7 @@ public class ReservacionServiceImp implements ReservacionService{
     }
     
     @Transactional
+    @Override
     public boolean eliminarReservacion(Long id){
         try{
             reservacionesDao.deleteById(id);
@@ -55,7 +56,7 @@ public class ReservacionServiceImp implements ReservacionService{
     }
     
     @Transactional(readOnly=true)
-    public ArrayList<ReservacionModel> obtenerPorFechaReserva(Date fechaReserva){
+    public ArrayList<ReservacionModel> obtenerPorFechaReserva(String fechaReserva){
         return reservacionesDao.findByFechaReserva(fechaReserva);
     }
 }

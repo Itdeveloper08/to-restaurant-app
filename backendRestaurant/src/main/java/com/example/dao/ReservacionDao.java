@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface ReservacionDao extends JpaRepository<ReservacionModel, Long>{
     public abstract ArrayList<ReservacionModel> findByPersona(String persona);
     public abstract ArrayList<ReservacionModel> findByDuiPersona(String duiPersona);
-    public abstract ArrayList<ReservacionModel> findByFechaReserva(Date fechaReserva);
+    public abstract ArrayList<ReservacionModel> findByFechaReserva(String fechaReserva);
 }

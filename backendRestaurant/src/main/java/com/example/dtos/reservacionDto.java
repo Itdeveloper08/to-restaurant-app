@@ -11,7 +11,7 @@ public class reservacionDto {
     private String persona;
     private String duiPersona;
     private Date fechaReservacion;
-    private Date fechaReserva;
+    private String fechaReserva;
     private String horaReserva;
     private Long numPersonas;
     private boolean activa;

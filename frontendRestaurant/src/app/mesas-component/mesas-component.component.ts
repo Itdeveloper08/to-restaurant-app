@@ -8,42 +8,30 @@ import { mesa } from '../Models/mesa';
   styleUrls: ['./mesas-component.component.css']
 })
 export class MesasComponentComponent implements OnInit{
-  numeroPiso = 1;
   mesas:mesa[]=[];
-  seleccion=0;
+  seleccion:number;
   mensajeConexion='No se pudieron cargar los recursos, compruebe la conexion a la base de datos';
-  listaDeImagenes:string[]=[
-    'assets/mesa5.png',
-    'assets/mesa2.png',
-    'assets/mesa2.png',
-    'assets/mesa2.png',
-    'assets/mesa2.png',
-    'assets/mesa5.png',
-    'assets/mesa6.png',
-    'assets/mesa6.png',
-    'assets/mesa6.png',
-    'assets/mesa6.png',
-    'assets/mesa5.png',
-    'assets/mesa2.png',
-    'assets/mesa2.png',
-    'assets/mesa2.png',
-    'assets/mesa2.png',
-    'assets/mesa5.png'
-  ];
+  img:string [] = ['assets/mesa2.png','assets/mesa5.png','assets/mesa6.png'];
+  listaDeImagenes:string[]=[this.img[1],this.img[0],this.img[0],this.img[0],this.img[0],this.img[1],this.img[2],this.img[2],this.img[2],this.img[2],this.img[1],this.img[0],this.img[0],this.img[0],this.img[0],this.img[1]];
   constructor(private mesasService:MesasService){}
   ngOnInit(): void {
     this.mesasService.obtenerMesas().subscribe(misMesas=>{
         try{
           this.mesas=Object.values(misMesas);
           this.mesasService.setMesas(this.mesas);
+          this.mensajeConexion='';
+          this.ver(0);
           console.log(this.mesas);
         }catch{
           this.mesas = [];
         }
       });
   }
+
   ver(id:number){
     this.seleccion=id;
   }
-  
+  recibirNumero(id: number) {
+    this.seleccion = id;
+  }
 }
