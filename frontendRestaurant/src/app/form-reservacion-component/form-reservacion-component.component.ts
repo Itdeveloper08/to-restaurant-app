@@ -208,6 +208,21 @@ export class FormReservacionComponentComponent implements OnInit {
     } else {
       this.errorHora = '';
     }
+    // Validar Fecha de Reserva
+  if (this.textoVacio(this.fechaReserva)) {
+    this.errorFecha = 'No puede quedar vacío!';
+    return false;
+  } else {
+    const fechaReserva = new Date(this.fechaReserva);
+    const fechaActual = new Date();
+
+    if (fechaReserva < fechaActual) {
+      this.errorFecha = 'La fecha de reserva no puede ser anterior a la fecha actual';
+      return false;
+    } else {
+      this.errorFecha = '';
+    }
+  }
     //validar numero
     if (this.textoVacio(this.numPersonas.toString())) {
       this.errorNum = 'No puede quedar vacío!';

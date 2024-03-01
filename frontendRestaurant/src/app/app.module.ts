@@ -17,6 +17,7 @@ import { ReservacionesService } from './Services/reservaciones.service';
 import { FormReservacionComponentComponent } from './form-reservacion-component/form-reservacion-component.component';
 import { InteriorMesasComponentComponent } from './interior-mesas-component/interior-mesas-component.component';
 import { ReservacionMesaService } from './Services/reservacionMesa.service';
+import { InspeccionarComponentComponent } from './inspeccionar-component/inspeccionar-component.component';
 
 const appRoutes:Routes=[
   {path:'', component:InicioComponentComponent},
@@ -24,6 +25,7 @@ const appRoutes:Routes=[
   {path:'reservaciones', component:ReservacionesComponentComponent},
   {path:'reservacion', component:FormReservacionComponentComponent},
   {path:'reservacion/:id', component:FormReservacionComponentComponent},
+  {path:'inspeccionar/:id', component:InspeccionarComponentComponent},
   {path:'**', component:ErrorPersonalizadoComponentComponent}
 ];
 
@@ -35,7 +37,8 @@ const appRoutes:Routes=[
     InicioComponentComponent,
     ReservacionesComponentComponent,
     FormReservacionComponentComponent,
-    InteriorMesasComponentComponent
+    InteriorMesasComponentComponent,
+    InspeccionarComponentComponent
   ],
   imports: [
     BrowserModule,

@@ -50,6 +50,13 @@ public class ReservacionController {
                 .map(this::convertirReservacionADto)
                 .collect(Collectors.toList());
     }
+    @GetMapping(path = "/{id}")
+    public ArrayList<reservacionDto> obtenerResservacionPorId(@PathVariable("id") Long id) {
+        Optional<ReservacionModel> reservaciones = this.reservacionS.obtenerPorId(id);
+        return (ArrayList<reservacionDto>) reservaciones.stream()
+                .map(this::convertirReservacionADto)
+                .collect(Collectors.toList());
+    }
 
     @PostMapping()
     public ResponseEntity<?> guardarReservacion(@RequestBody reservacionDto reservacion) {

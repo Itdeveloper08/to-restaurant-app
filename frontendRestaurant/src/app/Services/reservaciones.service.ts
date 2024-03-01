@@ -14,6 +14,9 @@ export class ReservacionesService{
     obtenerReservacionesPorFecha(fecha:string){
         return this.dataService.cargarReservacionesPorFecha(fecha);
     }
+    obtenerReservacionPorId(id:number){
+        return this.dataService.cargarReservacionPorId(id);
+    }
     EliminarReservacion(id:number){
         return this.dataService.EliminarReservacion(id);
     }

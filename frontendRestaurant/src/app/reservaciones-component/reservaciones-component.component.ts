@@ -32,7 +32,9 @@ export class ReservacionesComponentComponent implements OnInit{
   nuevaReservacion(){
     this.router.navigate(['/reservacion']);
   }
-  inspeccionarReservacion(id:number){}
+  inspeccionarReservacion(id:number){
+    this.router.navigate(['/inspeccionar/'+id]);
+  }
   modificarReservacion(id:number){}
   eliminarReservacion(pos:number){
     Swal.fire({
@@ -42,7 +44,7 @@ export class ReservacionesComponentComponent implements OnInit{
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: '¡Sí, agregar!'
+      confirmButtonText: '¡Sí, borrar!'
     }).then((result) => {
       if (result.isConfirmed) {
         let num = this.reservaciones[pos].id;
