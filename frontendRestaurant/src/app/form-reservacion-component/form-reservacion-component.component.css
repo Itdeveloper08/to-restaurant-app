@@ -93,7 +93,12 @@ label{
 }
 p{
     margin: 0;
+}
+.red{
     color: red;
+}
+.green{
+    color: green;
 }
 @media screen and (min-width:900px){
     .formulario{

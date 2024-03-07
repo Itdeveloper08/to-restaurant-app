@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.dao.ReservacionMesaDao;
 import com.example.models.MesaModel;
 import com.example.models.ReservacionModel;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class ReservacionMesaServiceImp implements ReservacionMesaService{
@@ -26,11 +24,13 @@ public class ReservacionMesaServiceImp implements ReservacionMesaService{
     ReservacionDao reservacionDao;
     
     @Transactional(readOnly=true)
+    @Override
     public ArrayList<ReservacionMesaModel> obtenerReservacionMesas(){
         return (ArrayList<ReservacionMesaModel>) reservacionMesaDao.findAll();
     }
 
     @Transactional
+    @Override
     public ReservacionMesaModel guardarReservacionMesa(ReservacionMesaModel reservacionMesaModel) {
         if (reservacionMesaModel.getMesa() == null) {
             throw new IllegalArgumentException("La mesa no se proporcionó correctamente en la reservación.");
@@ -57,11 +57,13 @@ public class ReservacionMesaServiceImp implements ReservacionMesaService{
     }
     
     @Transactional(readOnly=true)
+    @Override
     public Optional<ReservacionMesaModel> obtenerPorId(Long id){
         return reservacionMesaDao.findById(id);
     }
     
     @Transactional
+    @Override
     public boolean eliminarReservacionMesa(Long id){
         try{
             reservacionMesaDao.deleteById(id);

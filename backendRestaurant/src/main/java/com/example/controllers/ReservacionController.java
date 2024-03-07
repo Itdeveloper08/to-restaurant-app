@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import com.example.dtos.ApiResponse;
 import com.example.dtos.reservacionDto;
 import com.example.models.MesaModel;
 import com.example.models.ReservacionMesaModel;
@@ -8,19 +9,11 @@ import com.example.services.MesaService;
 import com.example.services.ReservacionMesaService;
 import com.example.services.ReservacionService;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/reservacion")
@@ -43,13 +36,6 @@ public class ReservacionController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/{fechaReserva}")
-    public ArrayList<reservacionDto> obtenerResservacionPorFecha(@PathVariable("fechaReserva") String fechaReserva) {
-        List<ReservacionModel> reservaciones = this.reservacionS.obtenerPorFechaReserva(fechaReserva);
-        return (ArrayList<reservacionDto>) reservaciones.stream()
-                .map(this::convertirReservacionADto)
-                .collect(Collectors.toList());
-    }
     @GetMapping(path = "/{id}")
     public ArrayList<reservacionDto> obtenerResservacionPorId(@PathVariable("id") Long id) {
         Optional<ReservacionModel> reservaciones = this.reservacionS.obtenerPorId(id);
@@ -59,19 +45,19 @@ public class ReservacionController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> guardarReservacion(@RequestBody reservacionDto reservacion) {
+    public ApiResponse guardarReservacion(@RequestBody reservacionDto reservacion) {
         ReservacionModel retorno = convertirDtoAReservacion(reservacion);
         //Si no vienen mesas en la reservacion
         if (reservacion.getMesas() == null) {
             ReservacionModel retornoReservacionModel = this.reservacionS.guardarReservacion(retorno);
             if (retornoReservacionModel == null) {
-                return ResponseEntity.badRequest().body("La reservacion no pudo guardarse, revise la estructura del json");
+                return new ApiResponse(400, "La reservacion no pudo guardarse, revise la estructura del json", null, "/reservacion");
             }
-            return ResponseEntity.ok(retornoReservacionModel);
+            return new ApiResponse(200, "Reservacion guardada correctamente", retorno, "/reservacion");
         }
         //todas las mesas en la lista deben tener id
         if (!reservacion.getMesas().stream().allMatch(mesa -> mesa.getId() != null)) {
-            return ResponseEntity.badRequest().body("Las mesas no se proporcionaron correctamente en la reservación.");
+            return new ApiResponse(400, "Las mesas no se proporcionaron correctamente en la reservación.", null, "/reservacion");
         }
         //Revisar si los id en la lista de mesas que se reciben, existen en la lista de mesas almacenadas
         ArrayList<MesaModel> mesasEnBd = mesaS.obtenerMesas();
@@ -87,40 +73,70 @@ public class ReservacionController {
                 }
             }
             if (!existeEnBd) {
-                return ResponseEntity.badRequest().body("Las mesas proporcionadas no se econtraron en los registros");
+                return new ApiResponse(400, "Las mesas proporcionadas no se econtraron en los registros", null, "/reservacion");
             }
         }
         //En este punto, verificamos que la reservacion y las mesas si son validas
         ReservacionModel retornoR = this.reservacionS.guardarReservacion(retorno);
         if (retornoR == null) {
-            return ResponseEntity.badRequest().body("La reservacion no pudo guardarse, revise la estructura del json");
+            return new ApiResponse(400, "La reservacion no pudo guardarse, revise la estructura del json", null, "/reservacion");
         }
         //guardando todas las mesas en la reservacion
-
         boolean mesasGuardadas = true;
         for (MesaModel mesaPost : mesasEnPost) {
             ReservacionMesaModel reservacionMesaModel = new ReservacionMesaModel();
             reservacionMesaModel.setReservacion(retornoR);
             reservacionMesaModel.setMesa(mesaPost);
             try {
-                ReservacionMesaModel savedReservacionMesa = reservaMesaS.guardarReservacionMesa(reservacionMesaModel);
+                reservaMesaS.guardarReservacionMesa(reservacionMesaModel);
             } catch (IllegalArgumentException e) {
                 mesasGuardadas = false;
             }
         }
         if (!mesasGuardadas) {
-            return ResponseEntity.badRequest().body("Las mesas presentaron error");
+            return new ApiResponse(400, "Las mesas presentaron error", null, "/reservacion");
         }
-        return ResponseEntity.ok("Reservacion guardada correctamente");
+        return new ApiResponse(200, "Reservacion guardada correctamente en", true, "/reservacion");
     }
 
     @DeleteMapping("/{id}")
-    public String eliminarPorId(@PathVariable("id") Long id) {
+    public ApiResponse eliminarPorId(@PathVariable("id") Long id) {
         boolean ok = this.reservacionS.eliminarReservacion(id);
         if (ok) {
-            return "Se eliminó la reservación con id " + id;
+            return new ApiResponse(200, "Se eliminó la reservacion con id " + id, null, "/reservacion");
         } else {
-            return "No se pudo eliminar la reservación con id " + id;
+            return new ApiResponse(400, "No se pudo eliminar la reservacion con id " + id, null, "/reservacion");
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse actualizarReservacion(@PathVariable("id") Long id, @RequestBody reservacionDto reservacionActualizada) {
+        Optional<ReservacionModel> reservacionExistenteOpt = reservacionS.obtenerPorId(id);
+        if (reservacionExistenteOpt.isPresent()) {
+            //Si la reservación existe la actualizamos
+            ReservacionModel retorno;
+            try {
+                retorno = reservacionS.guardarReservacion(convertirDtoAReservacion(reservacionActualizada));
+            } catch (IllegalArgumentException e) {
+                return new ApiResponse(400, e.getMessage() + id, null, "/reservacion");
+            }
+            List<MesaModel> mesasParaActualizar = reservacionActualizada.getMesas();
+            List<ReservacionMesaModel> reservacionesMesas = reservacionExistenteOpt.get().getReservacionMesa();
+            for (int i = 0; i < reservacionesMesas.size(); i++) {
+                reservaMesaS.eliminarReservacionMesa(reservacionesMesas.get(i).getId());
+            }
+            if (mesasParaActualizar != null) {
+                for (int i = 0; i < mesasParaActualizar.size(); i++) {
+                    ReservacionMesaModel RMM = new ReservacionMesaModel();
+                    RMM.setMesa(mesasParaActualizar.get(i));
+                    RMM.setReservacion(convertirDtoAReservacion(reservacionActualizada));
+                    reservaMesaS.guardarReservacionMesa(RMM);
+                }
+            }
+
+            return new ApiResponse(200, "Se actualizó la reservación con id " + id, true, "/reservacion");
+        } else {
+            return new ApiResponse(400, "No se encontró la reservación con id " + id, null, "/reservacion");
         }
     }
 

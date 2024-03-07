@@ -64,6 +64,13 @@ i{
 .p p{
     margin: 0;
 }
+.d-flex>div{
+    margin-right: 5px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: rgb(194,232,255);
+    border: 2px solid rgb(132,166,208);
+}
 @media screen and (max-width:600px){
     img{
         width: 50%;

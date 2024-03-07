@@ -1,6 +1,5 @@
 package com.example.models;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,9 +35,9 @@ public class ReservacionModel {
 
     @Column(name = "ACTIVA")
     private boolean activa;
-
-    @JsonIgnoreProperties(value = "reservacion")
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "reservacion")
-    private List<ReservacionMesaModel> reservacionMesa = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "reservacion", cascade = CascadeType.ALL)
+    @JsonIgnore // Evita la serialización recursiva
+    private List<ReservacionMesaModel> mesas = new ArrayList<>();
     
 }

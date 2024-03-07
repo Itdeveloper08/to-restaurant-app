@@ -35,8 +35,10 @@ export class ReservacionesComponentComponent implements OnInit{
   inspeccionarReservacion(id:number){
     this.router.navigate(['/inspeccionar/'+id]);
   }
-  modificarReservacion(id:number){}
-  eliminarReservacion(pos:number){
+  modificarReservacion(id:number){
+    this.router.navigate(['/reservacion/'+id]);
+  }
+  eliminarReservacion(id:number){
     Swal.fire({
       title: '¿Deseas borrar la reservacion?',
       text: "Esta accion no se podrá revertir!",
@@ -47,10 +49,7 @@ export class ReservacionesComponentComponent implements OnInit{
       confirmButtonText: '¡Sí, borrar!'
     }).then((result) => {
       if (result.isConfirmed) {
-        let num = this.reservaciones[pos].id;
-        if(num){
-          this.reservacionesService.EliminarReservacion(num);
-        }
+         this.reservacionesService.EliminarReservacion(id);
       }
     })
   }

@@ -16,9 +16,9 @@ import { ReservacionMesaService } from '../Services/reservacionMesa.service';
 })
 export class FormReservacionComponentComponent implements OnInit {
   indice: number;
-  mesas:mesa[]=[];
+  mesas: mesa[] = [];
   actualizar: boolean = false;
-  titulo:string = 'Nueva reservacion';
+  titulo: string = 'Nueva reservacion';
   persona: string = '';
   duiPersona: string = '';
   fechaReservacion: Date = new Date();
@@ -34,11 +34,13 @@ export class FormReservacionComponentComponent implements OnInit {
   activa: boolean = false;
   reservaciones: reservacion[] = [];
   reservacion: reservacion;
+  ////////////////////////////////////////////////////////////////////////////////////////
   zonaReservacion = true;
-  mesasReservadas:mesa[]=[];
+  ////////////////////////////////////////////////////////////////////////////////////////
+  mesasReservadas: mesa[] = [];
   mireservacion: reservacion;
-  seleccion:number;
-  constructor(private route: ActivatedRoute, private router: Router, private reservacionesService: ReservacionesService, private mesasService:MesasService,private reservacionMesaService:ReservacionMesaService) { }
+  //seleccion:number;
+  constructor(private route: ActivatedRoute, private router: Router, private reservacionesService: ReservacionesService, private mesasService: MesasService, private reservacionMesaService: ReservacionMesaService) { }
   ngOnInit(): void {
     this.indice = this.route.snapshot.params['id'];
     if (this.indice !== null && !isNaN(Number(this.indice))) {
@@ -59,7 +61,7 @@ export class FormReservacionComponentComponent implements OnInit {
             this.reservacion = this.reservaciones[this.indice];
             this.persona = this.reservacion.persona;
             this.duiPersona = this.reservacion.duiPersona;
-            this.fechaReserva = this.parseDate(this.reservacion.fechaReserva);
+            this.fechaReserva = this.reservacion.fechaReserva;
             this.horaSeleccionada = this.reservacion.horaReserva;
             this.numPersonas = this.reservacion.numPersonas;
           } catch {
@@ -72,11 +74,11 @@ export class FormReservacionComponentComponent implements OnInit {
         this.reservaciones = [];
       }
     });
-    this.mesasService.obtenerMesas().subscribe(misMesas=>{
-      try{
-        this.mesas=Object.values(misMesas);
+    this.mesasService.obtenerMesas().subscribe(misMesas => {
+      try {
+        this.mesas = Object.values(misMesas);
         this.mesasService.setMesas(this.mesas);
-      }catch{
+      } catch {
         this.mesas = [];
       }
     });
@@ -99,22 +101,19 @@ export class FormReservacionComponentComponent implements OnInit {
             if (result.isConfirmed) {
               this.titulo = 'Selecciona las mesas';
               this.zonaReservacion = false;
-              this.reservacionesService.agregarReservacion(this.mireservacion);
               //cargamos las reservaciones por fecha seleccionada
-              const partesFecha: string[] = this.fechaReserva.split('/');
-              const fechaFormateada: string = `${partesFecha[2]}-${partesFecha[1]}-${partesFecha[0]}`;
-              this.reservacionesService.obtenerReservacionesPorFecha(fechaFormateada.substring(20)).subscribe(misReservaciones => {
-                try{
+              this.reservacionesService.obtenerReservacionesPorFecha(this.fechaReserva).subscribe(misReservaciones => {
+                try {
                   this.reservaciones = Object.values(misReservaciones);
-                  for(let i = 0; i < this.reservaciones.length; i++) {
+                  for (let i = 0; i < this.reservaciones.length; i++) {
                     const reservacion = this.reservaciones[i];
                     if (reservacion && reservacion.mesas) {
-                      for(let j = 0; j < reservacion.mesas.length; j++) {
-                          this.mesasReservadas.push(reservacion.mesas[j]);
+                      for (let j = 0; j < reservacion.mesas.length; j++) {
+                        this.mesasReservadas.push(reservacion.mesas[j]);
                       }
+                    }
                   }
-                  }
-                }catch{
+                } catch {
                   this.reservaciones = [];
                 }
               });
@@ -129,53 +128,34 @@ export class FormReservacionComponentComponent implements OnInit {
           //LOGICA PARA LA ACTUALIZACION
           ///////////////////////////////////////
 
-
         }
       }
-    }else{
+    } else {
+      this.reservacionesService.agregarReservacion(this.mireservacion);
       this.router.navigate(['/reservaciones']);
     }
   }
 
-  cancelar(){
+  cancelar() {
     this.router.navigate(['/reservaciones']);
   }
   recibirNumero(id: number) {
-    this.seleccion = id;
-    Swal.fire({
-      title: '¿Desea agregar la mesa numero '+this.mesas[id].id+'?',
-      text: "Asegurate que no esté reservada",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: '¡Sí, agregar!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        let reservada=false;
-        for(let i=0;i<this.mesasReservadas.length;i++){
-          if(this.mesasReservadas[i].id==this.mesas[id].id){
-            reservada=true;
-          }
-        }
-        if(reservada){
-          Swal.fire(
-            'No se puede reservar',
-            'La mesa ya a sido reservada anteriormente',
-            'error'
-          ).then((result) => {})
-        }else{
-          //Obtener ultima reservacion
-          this.reservacionesService.obtenerReservaciones().subscribe(misReservaciones => {
-            try {
-              this.reservaciones = Object.values(misReservaciones);
-              const resMesa = new reservacionMesa(this.reservaciones[this.reservaciones.length-1],this.mesas[id]);
-              console.log(resMesa);
-              this.reservacionMesaService.agregarReservacionMesa(resMesa);
-            }catch{}
-            })
-        }
-      }});
+    let reservada = false;
+    for (let i = 0; i < this.mesasReservadas.length; i++) {
+      if (this.mesasReservadas[i].id == this.mesas[id].id) {
+        reservada = true;
+      }
+    }
+    if (reservada) {
+      Swal.fire(
+        'No se puede reservar',
+        'La mesa ya a sido reservada anteriormente',
+        'error'
+      ).then((result) => { })
+    } else {
+        if (!this.mireservacion.mesas) this.mireservacion.mesas = [];
+        this.mireservacion.mesas.push(new mesa((id + 1), 0));
+    }
   }
   validar(): boolean {
     //Validar nombre
@@ -209,20 +189,20 @@ export class FormReservacionComponentComponent implements OnInit {
       this.errorHora = '';
     }
     // Validar Fecha de Reserva
-  if (this.textoVacio(this.fechaReserva)) {
-    this.errorFecha = 'No puede quedar vacío!';
-    return false;
-  } else {
-    const fechaReserva = new Date(this.fechaReserva);
-    const fechaActual = new Date();
-
-    if (fechaReserva < fechaActual) {
-      this.errorFecha = 'La fecha de reserva no puede ser anterior a la fecha actual';
+    if (this.textoVacio(this.fechaReserva)) {
+      this.errorFecha = 'No puede quedar vacío!';
       return false;
     } else {
-      this.errorFecha = '';
+      const fechaReserva = new Date(this.fechaReserva);
+      const fechaActual = new Date();
+
+      if (fechaReserva < fechaActual) {
+        this.errorFecha = 'La fecha de reserva no puede ser anterior a la fecha actual';
+        return false;
+      } else {
+        this.errorFecha = '';
+      }
     }
-  }
     //validar numero
     if (this.textoVacio(this.numPersonas.toString())) {
       this.errorNum = 'No puede quedar vacío!';
@@ -230,7 +210,9 @@ export class FormReservacionComponentComponent implements OnInit {
     } else if (!Number.isInteger(this.numPersonas) || this.numPersonas < 1) {
       this.errorNum = 'cantidad de personas no aceptada';
       return false;
-    } else {
+    } else if (!maximasPersonas(this.numPersonas)){
+      this.errorNum = 'No hay suficientes mesas para cubir esta cantidad de personas';
+    }else {
       this.errorNum = '';
     }
     return true;
@@ -251,8 +233,19 @@ export class FormReservacionComponentComponent implements OnInit {
     const horaRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9] PM$/;
     return horaRegex.test(hora);
   }
-  parseDate(fecha: string) {
-    return fecha.substring(0, 10);
+  maximasPersonas(cantidadPersonas:number): boolean {
+    //54
+    let maxPersonas = 54;
+    //Seleccionamos todas las reservaciones con la fecha que deseamos ingresar
+    if (this.mireservacion.mesas == null && cantidadPersonas <= 54) return true;
+    if (this.mireservacion.mesas != null) {
+    for (let i = 0; i < this.mireservacion.mesas.length; i++) {
+        if(this.mireservacion.mesas[i].){
+
+        }
+    }
+}
+    return true;
   }
-  
+
 }

@@ -37,4 +37,8 @@ export class InspeccionarComponentComponent implements OnInit{
   regresar(){
     this.router.navigate(['/reservaciones']);
   }
+  parseDate(fecha: Date) {
+    let f = fecha.toString();
+    return f.substring(0, 10);
+  }
 }

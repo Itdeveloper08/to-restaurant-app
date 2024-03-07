@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { mesa } from "../Models/mesa";
-import { Observable } from "rxjs";
+import { Observable, catchError, tap, throwError } from "rxjs";
 import { reservacion } from "../Models/reservacion";
 import { reservacionMesa } from "../Models/reservacionMesa";
 import { environment } from "../environment";
@@ -33,21 +33,29 @@ export class DataServices{
         return this.HttpClient.get(environment.urlBackend+'reservacion');
     }
     cargarReservacionesPorFecha(fecha:string){
-        return this.HttpClient.get(environment.urlBackend+'reservacion/'+fecha);
+        return this.HttpClient.get(environment.urlBackend+'reservacion/query?fechaReserva='+fecha);
     }
     cargarReservacionPorId(id:number){
         return this.HttpClient.get(environment.urlBackend+'reservacion/'+id);
     }
     EliminarReservacion(id:number){
-        const retorno = this.HttpClient.delete(environment.urlBackend+'reservacion/'+id);
-        console.log(retorno);
-        return retorno;
+        return this.HttpClient.delete(environment.urlBackend+'reservacion/'+id)
+            .pipe(
+                tap(() => {
+                    console.log('La reservación fue eliminada exitosamente');
+                }),
+                catchError(error => {
+                    console.log('Error al eliminar la reservación: ', error);
+                    return throwError(error);
+                })
+            );
     }
 
     guardarReservacion(reservacion: reservacion): Observable<boolean> {
         return new Observable<boolean>((observer) => {
             this.HttpClient.post(environment.urlBackend+'reservacion', reservacion).subscribe({
                 next: (response) => {
+                    console.log(response);
                     console.log('Se ha guardado la reservacion ' + response);
                     observer.next(true);
                     observer.complete();

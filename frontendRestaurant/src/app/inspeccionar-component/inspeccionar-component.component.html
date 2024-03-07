@@ -8,26 +8,26 @@
             </div>
             <div class="derecha">
                 <p><strong>Codigo: </strong>{{reservacionSelec.id}}</p>
-                <p><strong>Dui: </strong>{{reservacionSelec.persona}}</p>
+                <p><strong>Dui: </strong>{{reservacionSelec.duiPersona}}</p>
                 <p><strong>Cliente: </strong>{{reservacionSelec.persona}}</p>
-                <p><strong>Fecha reservacion: </strong>{{reservacionSelec.fechaReservacion}}</p>
-                <p><strong>fecha reserva: </strong>{{reservacionSelec.fechaReserva}}</p>
-                <p><strong>hora reserva: </strong>{{reservacionSelec.horaReserva}}</p>
-                <p><strong>numero de personas: </strong>{{reservacionSelec.numPersonas}}</p>
+                <p><strong>Fecha reservacion: </strong>{{parseDate(reservacionSelec.fechaReservacion)}}</p>
+                <p><strong>Fecha reserva: </strong>{{reservacionSelec.fechaReserva}}</p>
+                <p><strong>Hora reserva: </strong>{{reservacionSelec.horaReserva}}</p>
+                <p><strong>Numero de personas: </strong>{{reservacionSelec.numPersonas}}</p>
             </div>
         </div>
         <div class="flex2">
             <div class="col-md-6">
                 <p>
-                    <strong>Direcciones:</strong>
+                    <strong>Mesas:</strong>
                 </p>
-                <ol>
-                    <li *ngFor="let mesa of reservaciones[0].mesas let i=index">
-                        numero de mesa: {{mesa.id}}
+                <div class="d-flex">
+                    <div *ngFor="let mesa of reservaciones[indice].mesas let i=index">
+                        Mesa #{{mesa.id}}
                         <br>
-                        capacidad: {{mesa.capacidad}}
-                    </li>
-                </ol>
+                        {{mesa.capacidad}} asientos
+                    </div>
+                </div>
             </div>
         </div>
     </div>

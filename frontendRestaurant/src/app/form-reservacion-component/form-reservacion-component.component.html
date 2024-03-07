@@ -29,15 +29,17 @@
             </div>
             <div class="col-md-2" *ngIf="!zonaReservacion">
                 <strong>Reservadas</strong>
-                <p *ngFor="let mesasR of mesasReservadas">
+                <p *ngFor="let mesasR of mesasReservadas" class="red">
                     Mesa: {{mesasR.id}}
                 </p>
             </div>
             <div class="col-md-2" *ngIf="!zonaReservacion">
                 <strong>Seleccionadas</strong>
+                <p *ngFor="let mesasR of mireservacion.mesas" class="green">
+                    Mesa: {{mesasR.id}}
+                </p>
             </div>
         </div>
-        
         <div class="flex separar">
             <button type="submit">Guardar</button>
             <button type="button" (click)="cancelar()">Salir</button>
