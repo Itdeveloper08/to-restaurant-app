@@ -68,6 +68,23 @@ export class DataServices{
             });
         });
     }
+    actualizarReservacion(reservacion: reservacion): Observable<boolean> {
+        return new Observable<boolean>((observer) => {
+            this.HttpClient.put(environment.urlBackend+'reservacion/'+reservacion.id, reservacion).subscribe({
+                next: (response) => {
+                    console.log(response);
+                    console.log('Se ha actualizado la reservacion ' + response);
+                    observer.next(true);
+                    observer.complete();
+                },
+                error: (error) => {
+                    console.log('Error' + error);
+                    observer.next(false);
+                    observer.complete();
+                },
+            });
+        });
+    }
     agregarMesaAReservacion(reservacionesMesa: reservacionMesa): Observable<boolean> {
         return new Observable<boolean>((observer) => {
             this.HttpClient.post(environment.urlBackend+'reservacionMesa', reservacionesMesa).subscribe({

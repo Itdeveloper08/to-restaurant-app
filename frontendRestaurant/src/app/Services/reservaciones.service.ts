@@ -63,4 +63,21 @@ export class ReservacionesService {
             }
         });
     }
+    actualizarReservacion(r: reservacion) {
+        this.dataService.actualizarReservacion(r).subscribe(resultado => {
+            if (resultado) {
+                Swal.fire(
+                    'Reservacion',
+                    'actualizada correctamente',
+                    'success'
+                )
+            } else {
+                Swal.fire(
+                    'Error!',
+                    'Ocurrio un error al intentar actualizar la reservacion',
+                    'success'
+                )
+            }
+        });
+    }
 }

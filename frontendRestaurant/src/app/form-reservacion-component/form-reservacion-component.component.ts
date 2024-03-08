@@ -6,7 +6,6 @@ import { reservacion } from '../Models/reservacion';
 import Swal from 'sweetalert2';
 import { mesa } from '../Models/mesa';
 import { MesasService } from '../Services/mesas.service';
-import { reservacionMesa } from '../Models/reservacionMesa';
 import { ReservacionMesaService } from '../Services/reservacionMesa.service';
 
 @Component({
@@ -123,15 +122,36 @@ export class FormReservacionComponentComponent implements OnInit {
             }
           })
         } else {
-
-          ///////////////////////////////////////
-          //LOGICA PARA LA ACTUALIZACION
-          ///////////////////////////////////////
-
+          this.mireservacion = new reservacion(this.reservacion.id, this.persona, this.duiPersona, this.fechaReservacion, this.fechaReserva, this.horaSeleccionada, this.numPersonas, true, null);
+          this.zonaReservacion = false;
+          this.mireservacion.mesas = this.reservacion.mesas;
+          this.reservacionesService.obtenerReservacionesPorFecha(this.fechaReserva).subscribe(misReservaciones => {
+            try {
+              this.reservaciones = Object.values(misReservaciones);
+              for (let i = 0; i < this.reservaciones.length; i++) {
+                const reservacion = this.reservaciones[i];
+                if(reservacion.id != this.reservacion.id){
+                  if (reservacion && reservacion.mesas) {
+                    for (let j = 0; j < reservacion.mesas.length; j++) {
+                      this.mesasReservadas.push(reservacion.mesas[j]);
+                    }
+                  }
+                }
+              }
+            } catch {
+              this.reservaciones = [];
+            }
+          });
         }
       }
     } else {
-      this.reservacionesService.agregarReservacion(this.mireservacion);
+      if (!this.actualizar) {
+        //Guarda
+        this.reservacionesService.agregarReservacion(this.mireservacion);
+      } else {
+        //Actualiza
+        this.reservacionesService.actualizarReservacion(this.mireservacion);
+      }
       this.router.navigate(['/reservaciones']);
     }
   }
@@ -141,20 +161,36 @@ export class FormReservacionComponentComponent implements OnInit {
   }
   recibirNumero(id: number) {
     let reservada = false;
+    let seleccionada = false;
     for (let i = 0; i < this.mesasReservadas.length; i++) {
       if (this.mesasReservadas[i].id == this.mesas[id].id) {
         reservada = true;
       }
     }
+    if (this.mireservacion.mesas != null) {
+      for (let i = 0; i < this.mireservacion.mesas.length; i++) {
+        if (this.mireservacion.mesas[i].id == this.mesas[id].id) {
+          seleccionada = true;
+        }
+      }
+    }
+
     if (reservada) {
       Swal.fire(
         'No se puede reservar',
         'La mesa ya a sido reservada anteriormente',
         'error'
       ).then((result) => { })
-    } else {
-        if (!this.mireservacion.mesas) this.mireservacion.mesas = [];
-        this.mireservacion.mesas.push(new mesa((id + 1), 0));
+    } else if (seleccionada) {
+      Swal.fire(
+        'No se puede reservar',
+        'No se puede reservar la misma mesa mas de una vez',
+        'error'
+      ).then((result) => { })
+    }
+    else {
+      if (!this.mireservacion.mesas) this.mireservacion.mesas = [];
+      this.mireservacion.mesas.push(new mesa((id + 1), 0));
     }
   }
   validar(): boolean {
@@ -210,9 +246,10 @@ export class FormReservacionComponentComponent implements OnInit {
     } else if (!Number.isInteger(this.numPersonas) || this.numPersonas < 1) {
       this.errorNum = 'cantidad de personas no aceptada';
       return false;
-    } else if (!maximasPersonas(this.numPersonas)){
+    } else if (!this.maximasPersonas(this.numPersonas)) {
       this.errorNum = 'No hay suficientes mesas para cubir esta cantidad de personas';
-    }else {
+      return false;
+    } else {
       this.errorNum = '';
     }
     return true;
@@ -233,19 +270,36 @@ export class FormReservacionComponentComponent implements OnInit {
     const horaRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9] PM$/;
     return horaRegex.test(hora);
   }
-  maximasPersonas(cantidadPersonas:number): boolean {
+  maximasPersonas(cantidadPersonas: number): boolean {
     //54
     let maxPersonas = 54;
+    let contador = 0;
+    let reservaionesSeleccionadas = [];
     //Seleccionamos todas las reservaciones con la fecha que deseamos ingresar
-    if (this.mireservacion.mesas == null && cantidadPersonas <= 54) return true;
-    if (this.mireservacion.mesas != null) {
-    for (let i = 0; i < this.mireservacion.mesas.length; i++) {
-        if(this.mireservacion.mesas[i].){
-
-        }
+    for (let i = 0; i < this.reservaciones.length; i++) {
+      if (this.reservaciones[i].fechaReserva == this.fechaReserva) {
+        reservaionesSeleccionadas.push(this.reservaciones[i]);
+      }
     }
-}
-    return true;
+    for (let i = 0; i < reservaionesSeleccionadas.length; i++) {
+      let resTemp = reservaionesSeleccionadas[i];
+      if (resTemp.mesas) {
+        for (let j = 0; j < resTemp.mesas.length; j++) {
+          let mesa = resTemp.mesas[j];
+          contador += mesa.capacidad;
+        }
+      }
+    }
+    let cantidadisponible = maxPersonas - contador;
+    if (cantidadPersonas <= cantidadisponible) {
+      return true;
+    } else {
+      return false;
+    }
   }
-
+  quitar(num: number) {
+    if (this.mireservacion.mesas != null) {
+      this.mireservacion.mesas.splice(num, 1);
+    }
+  }
 }

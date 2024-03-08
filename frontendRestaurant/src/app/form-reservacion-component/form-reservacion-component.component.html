@@ -24,20 +24,20 @@
                 [(ngModel)]="numPersonas">
         </div>
         <div class="col-md-12 flex">
-            <div class="col-md-8" *ngIf="!zonaReservacion">
+            <div class="col-md-8 col-xs-6" *ngIf="!zonaReservacion">
                 <app-interior-mesas-component (numeroEnviado)="recibirNumero($event)"></app-interior-mesas-component>
             </div>
-            <div class="col-md-2" *ngIf="!zonaReservacion">
+            <div class="col-md-2 col-xs-3" *ngIf="!zonaReservacion">
                 <strong>Reservadas</strong>
-                <p *ngFor="let mesasR of mesasReservadas" class="red">
+                <p *ngFor="let mesasR of mesasReservadas" class="red lista">
                     Mesa: {{mesasR.id}}
                 </p>
             </div>
-            <div class="col-md-2" *ngIf="!zonaReservacion">
+            <div class="col-md-2 col-xs-3" *ngIf="!zonaReservacion">
                 <strong>Seleccionadas</strong>
-                <p *ngFor="let mesasR of mireservacion.mesas" class="green">
-                    Mesa: {{mesasR.id}}
-                </p>
+                <div *ngFor="let mesasR of mireservacion.mesas; let i = index" class="green flex">
+                    <p class="lista">Mesa: {{mesasR.id}}</p><i class="bi bi-x-lg lista" (click)="quitar(i)"></i>
+                </div>
             </div>
         </div>
         <div class="flex separar">

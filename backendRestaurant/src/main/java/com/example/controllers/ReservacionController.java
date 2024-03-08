@@ -44,6 +44,14 @@ public class ReservacionController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/query")
+    public ArrayList<reservacionDto> obtenerResservacionPorFecha(@RequestParam("fechaReserva") String fechaReserva){
+        ArrayList<ReservacionModel> reservaciones = this.reservacionS.obtenerPorFechaReserva(fechaReserva);
+        return (ArrayList<reservacionDto>) reservaciones.stream()
+                .map(this::convertirReservacionADto)
+                .collect(Collectors.toList());
+    }
+    
     @PostMapping()
     public ApiResponse guardarReservacion(@RequestBody reservacionDto reservacion) {
         ReservacionModel retorno = convertirDtoAReservacion(reservacion);
@@ -96,7 +104,7 @@ public class ReservacionController {
         if (!mesasGuardadas) {
             return new ApiResponse(400, "Las mesas presentaron error", null, "/reservacion");
         }
-        return new ApiResponse(200, "Reservacion guardada correctamente en", true, "/reservacion");
+        return new ApiResponse(200, "Reservacion guardada correctamente", true, "/reservacion");
     }
 
     @DeleteMapping("/{id}")

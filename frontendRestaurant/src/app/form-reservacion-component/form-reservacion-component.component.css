@@ -99,10 +99,37 @@ p{
 }
 .green{
     color: green;
+    justify-content:space-between;
+}
+i{
+    margin-right: 20%;
+}
+i:hover{
+    cursor: pointer;
 }
 @media screen and (min-width:900px){
     .formulario{
         width: 55%;
     }
-    
+}
+
+@media screen and (max-width: 1200px) {
+    strong, .lista{
+        font-size: 80%; /* Reducir el tamaño de la fuente en pantallas más pequeñas */
+    }
+}
+
+@media screen and (max-width: 992px) {
+    strong, .lista{
+        font-size: 70%; /* Reducir aún más el tamaño de la fuente en pantallas más pequeñas */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    strong, .lista{
+        font-size: 50%; /* Reducir aún más el tamaño de la fuente en pantallas más pequeñas */
+    }
+    i{
+        margin-right: 0;
+    }
 }
